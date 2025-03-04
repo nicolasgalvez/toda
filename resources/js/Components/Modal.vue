@@ -1,20 +1,18 @@
-<script setup>
+<script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
-const props = defineProps({
-    show: {
-        type: Boolean,
-        default: false,
+const props = withDefaults(
+    defineProps<{
+        show?: boolean;
+        maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+        closeable?: boolean;
+    }>(),
+    {
+        show: false,
+        maxWidth: '2xl',
+        closeable: true,
     },
-    maxWidth: {
-        type: String,
-        default: '2xl',
-    },
-    closeable: {
-        type: Boolean,
-        default: true,
-    },
-});
+);
 
 const emit = defineEmits(['close']);
 const dialog = ref();
@@ -45,7 +43,7 @@ const close = () => {
     }
 };
 
-const closeOnEscape = (e) => {
+const closeOnEscape = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
         e.preventDefault();
 
@@ -97,7 +95,7 @@ const maxWidthClass = computed(() => {
                     @click="close"
                 >
                     <div
-                        class="absolute inset-0 bg-gray-500 opacity-75"
+                        class="absolute inset-0 bg-gray-500 opacity-75 dark:bg-gray-900"
                     />
                 </div>
             </Transition>
@@ -112,7 +110,7 @@ const maxWidthClass = computed(() => {
             >
                 <div
                     v-show="show"
-                    class="mb-6 transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:mx-auto sm:w-full"
+                    class="mb-6 transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:mx-auto sm:w-full dark:bg-gray-800"
                     :class="maxWidthClass"
                 >
                     <slot v-if="showSlot" />
