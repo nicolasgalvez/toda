@@ -1,0 +1,51 @@
+name: todah
+recipe: laravel
+config:
+  via: nginx
+  database: mariadb
+  webroot: public
+  php: '8.3'
+  cache: none
+  xdebug: 'develop,debug'
+services:
+  appserver:
+    overrides:
+      environment:
+        # Support XDEBUG.
+        PHP_IDE_CONFIG: "serverName=appserver"
+        # Support debugging CLI with Xdebug.
+        XDEBUG_SESSION_START: lando
+        # Laravel vars
+        APP_URL: https://todah.lndo.site
+    build_as_root:
+      - set -eux;
+      - rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && pkill -o -USR2 php-fpm
+  node:
+    type: node:22
+    scanner: false
+    platform: linux/arm64
+    ports:
+      - 3069:3069
+    build:
+      - npm install
+      - npm run build
+tooling:
+  dev:
+    service: node
+    cmd: npm run dev
+  build:
+    service: node
+    cmd: npm run build
+  npm:
+    service: node
+    cmd: npm
+  xdebug-on:
+    service: appserver
+    description: Enable xdebug for nginx.
+    cmd: rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && docker-php-ext-enable xdebug && pkill -o -USR2 php-fpm && echo "Xdebug enabled"
+    user: root
+  xdebug-off:
+    service: appserver
+    description: Disable xdebug for nginx.
+    cmd: rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && pkill -o -USR2 php-fpm && echo "Xdebug disabled"
+    user: root
