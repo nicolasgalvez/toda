@@ -20,7 +20,7 @@ export default defineConfig({
     server: {
         https: false,
         host: true,
-        port: 3069,
-        hmr: {host: 'localhost', protocol: 'ws'},
+        port: 3068,
+        hmr: { host: 'localhost', protocol: 'ws' },
     },
 });

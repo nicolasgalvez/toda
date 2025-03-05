@@ -1,8 +1,7 @@
-name: todah
+name: todah2
 recipe: laravel
 config:
   via: nginx
-  database: mariadb
   webroot: public
   php: '8.3'
   cache: none
@@ -20,12 +19,20 @@ services:
     build_as_root:
       - set -eux;
       - rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && pkill -o -USR2 php-fpm
+      - cp .env.example .env
+      - cp .env.example .env
+      - php artisan migrate
+      - php artisan key:generate
+      - php artisan key:generate --env=testing
   node:
+    overrides:
+      environment:
+        APP_URL: https://todah.lndo.site
     type: node:22
     scanner: false
     platform: linux/arm64
     ports:
-      - 3069:3069
+      - 3068:3068
     build:
       - npm install
       - npm run build
