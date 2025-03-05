@@ -64,6 +64,7 @@ const triggerConfetti = () => {
 </script>
 
 <template>
+
     <Head title="Dashboard" />
     <AuthenticatedLayout>
         <template #header>
@@ -72,41 +73,24 @@ const triggerConfetti = () => {
             </h2>
         </template>
         <Wrapper>
-            <form
-                @submit.prevent="submit"
-                class="flex flex-row flex-wrap items-center justify-start gap-2 lg:w-1/2"
-            >
-                <input
-                    class="flex-grow"
-                    v-model="form.title"
-                    type="text"
-                    placeholder="New To-Do"
-                />
+            <form @submit.prevent="submit" class="flex flex-row flex-wrap items-center justify-start gap-2 lg:w-1/2">
+                <input class="flex-grow" v-model="form.title" type="text" placeholder="New To-Do" />
                 <Button type="submit">Add</Button>
-                <fieldset class = "flex w-full justify-between">
+                <fieldset class="flex w-full justify-between hidden">
                     <legend>Manage</legend>
                     <Button>Archive Completed</Button>
                 </fieldset>
             </form>
             <ul aria-live="polite" class="flex flex-col justify-start lg:w-1/2">
-                <li
-                    v-for="todo in todos"
-                    :key="todo.id"
-                    :class="{
-                        'bg-gray-400 text-gray-500 line-through':
-                            todo.completed,
-                        'text-black': !todo.completed,
-                    }"
-                    class="my-2 flex items-center justify-between gap-2 pl-2 even:bg-gray-100"
-                >
-                    <Checkbox
-                        :aria-checked="todo.completed.toString()"
-                        :checked="todo.completed"
-                        @change="updateTodo(todo.id, $event.target.checked)"
-                    />
+                <li v-for="todo in todos" :key="todo.id" :class="{
+                    'bg-gray-400 text-gray-500 line-through':
+                        todo.completed,
+                    'text-black': !todo.completed,
+                }" class="my-2 flex items-center justify-between gap-2 pl-2 even:bg-gray-100">
+                    <Checkbox :aria-checked="todo.completed.toString()" :checked="todo.completed"
+                        @change="updateTodo(todo.id, $event.target.checked)" />
                     {{ todo.title }}
-                    <Button class="ml-auto" @click="deleteTodo(todo.id)"
-                        >Delete
+                    <Button class="ml-auto" @click="deleteTodo(todo.id)">Delete
                     </Button>
                 </li>
             </ul>
