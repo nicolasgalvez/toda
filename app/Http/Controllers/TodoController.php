@@ -15,8 +15,13 @@ class TodoController extends Controller
 
     public function index(): Response
     {
+        $user = Auth::user();
+        if (!$user) {
+            abort(401, 'Unauthorized');
+        }
+
         return Inertia::render('Todos/Index', [
-            'todos' => Auth::user()->todos()->orderBy('created_at', 'desc')->get(),
+            'todos' => $user->todos()->orderBy('created_at', 'desc')->get(),
         ]);
     }
 
@@ -26,7 +31,11 @@ class TodoController extends Controller
             'title' => 'required|string|max:255',
         ]);
 
-        Auth::user()->todos()->create($request->only('title', 'description'));
+        Auth::user()->todos()->create([
+            'title' => $request->title,
+            'description' => $request->description ?? null,
+            'user_id' => Auth::id(), // ✅ Ensure user_id is set explicitly
+        ]);
 
         return redirect()->route('todos.index');
     }
@@ -35,7 +44,13 @@ class TodoController extends Controller
     {
         $this->authorize('update', $todo);
 
-        $todo->update($request->only('title', 'description', 'completed'));
+        $validated = $request->validate([
+            'title' => 'sometimes|string|max:255',
+            'description' => 'nullable|string',
+            'completed' => 'sometimes|boolean', // ✅ Ensure completed is properly handled
+        ]);
+
+        $todo->update($validated);
 
         return redirect()->route('todos.index');
     }
@@ -43,9 +58,13 @@ class TodoController extends Controller
     public function destroy(Todo $todo)
     {
         $this->authorize('delete', $todo);
+
+        if (!$todo) {
+            abort(404, 'Todo not found');
+        }
+
         $todo->delete();
 
         return redirect()->route('todos.index');
     }
-
 }
